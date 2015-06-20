@@ -4,19 +4,24 @@ import (
     "fmt"
     "gopkg.in/mgo.v2"
     "gopkg.in/mgo.v2/bson"
-    "github.com/flosch/pongo2"
 
     "github.com/johanhenriksson/edetalj-backend/types"
+    "github.com/johanhenriksson/edetalj-backend/views"
 )
 
-var template = pongo2.Must(pongo2.FromFile("templates/user.html"))
+//var template = pongo2.Must(pongo2.FromFile("templates/base/user.twig"))
 
 type UserService struct {
-    Users       *mgo.Collection
+    Users           *mgo.Collection
+    UserTemplate    *views.Template
+}
+
+func (srv UserService) Load() {
+    /* get from app reference or something */
 }
 
 func (srv UserService) Path() string {
-    return "/user"
+    return "/api/user"
 }
 
 func (srv UserService) Routes() Routes {
@@ -44,27 +49,24 @@ func (srv UserService) Routes() Routes {
     }
 }
 
-func (srv *UserService) GetAll(p RouteParams) {
+func (srv *UserService) GetAll(p RouteArgs) {
     fmt.Fprintf(p.Writer, "Get All<br>")
 }
 
-func (srv *UserService) Get(p RouteParams) {
-
+func (srv *UserService) Get(p RouteArgs) {
     user := types.User { }
     srv.Users.Find(bson.M{ "email": p.Vars["id"] }).One(&user)
 
-    template.ExecuteWriter(pongo2.Context{
-        "user": user,
-    }, p.Writer)
-
-    /*
-    fmt.Fprintf(p.Writer, "Get Single\n")
-    fmt.Fprintf(p.Writer, "Email: %s\n", user.Email)
-    fmt.Fprintf(p.Writer, "Level: %d\n", user.Level)
-    */
+    view := views.NewView(srv.UserTemplate)
+    view.Render(views.ViewContext{
+        Writer: p.Writer,
+        Vars: map[string]interface{} {
+            "user": user,
+        },
+    })
 }
 
-func (srv *UserService) Put(p RouteParams) {
+func (srv *UserService) Put(p RouteArgs) {
     fmt.Fprintf(p.Writer, "Put Single\n")
 
     user := types.User { }

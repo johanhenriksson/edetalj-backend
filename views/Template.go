@@ -34,7 +34,7 @@ func NewTheme(name string) *Theme {
 func (t *Theme) File(name string) string {
     filename := fmt.Sprintf("templates/%s/%s", t.Path, name)
     if _, err := os.Stat(filename); os.IsNotExist(err) {
-        fmt.Printf("no such file or directory: %s", filename)
+        fmt.Printf("Template not found: %s", filename)
     }
     return filename
 }
@@ -59,12 +59,10 @@ func (t *Theme) LoadTemplate(name string) *Template {
         Template: pongo2.Must(pongo2.FromFile(filename)),
     }
     t.Templates[name] = template
-    fmt.Println("Loaded template", name, ":", filename)
+    fmt.Println("Loaded template", filename)
     return template
 }
 
 func (t *Template) Render(context ViewContext) {
-    fmt.Println("Render Template")
-    fmt.Println(context.Writer)
     t.Template.ExecuteWriter(context.Vars, context.Writer)
 }

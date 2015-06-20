@@ -8,6 +8,7 @@ import (
     "github.com/gorilla/rpc/json"
 
     "github.com/johanhenriksson/edetalj-backend/api"
+    "github.com/johanhenriksson/edetalj-backend/views"
 )
 
 func main() {
@@ -20,13 +21,21 @@ func main() {
     }
 
     database := mongo.DB(database_name)
-
     router := api.NewRouter()
+    theme := views.NewTheme("base")
 
-    us := api.UserService {
+    tpl := theme.GetTemplate("user.twig")
+
+    /* User */
+    us := &api.UserService {
         Users: database.C("users"),
+        UserTemplate: tpl,
     }
     router.Register(us)
+
+    vs := &api.ViewService {
+    }
+    router.Register(vs)
 
     fmt.Println("E-detalj Authentication Server v0.1")
 
@@ -37,3 +46,4 @@ func main() {
 
     http.ListenAndServe(":8000", router.Mux())
 }
+
