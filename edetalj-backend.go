@@ -1,11 +1,8 @@
 package main
 
 import (
-    "fmt"
     "net/http"
     "gopkg.in/mgo.v2"
-    "github.com/gorilla/rpc"
-    "github.com/gorilla/rpc/json"
 
     "github.com/johanhenriksson/edetalj-backend/api"
     "github.com/johanhenriksson/edetalj-backend/views"
@@ -24,25 +21,16 @@ func main() {
     router := api.NewRouter()
     theme := views.NewTheme("base")
 
-    tpl := theme.GetTemplate("user.twig")
-
     /* User */
     us := &api.UserService {
         Users: database.C("users"),
-        UserTemplate: tpl,
+        UserTemplate: theme.GetTemplate("user.twig"),
     }
     router.Register(us)
 
     vs := &api.ViewService {
     }
     router.Register(vs)
-
-    fmt.Println("E-detalj Authentication Server v0.1")
-
-    /* JSON RPC Handler */
-    rpc := rpc.NewServer()
-    rpc.RegisterCodec(json.NewCodec(), "application/json")
-    http.Handle("/rpc", rpc)
 
     http.ListenAndServe(":8000", router.Mux())
 }

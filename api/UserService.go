@@ -7,6 +7,7 @@ import (
 
     "github.com/johanhenriksson/edetalj-backend/types"
     "github.com/johanhenriksson/edetalj-backend/views"
+    "github.com/flosch/pongo2"
 )
 
 //var template = pongo2.Must(pongo2.FromFile("templates/base/user.twig"))
@@ -62,6 +63,15 @@ func (srv *UserService) Get(p RouteArgs) {
         Writer: p.Writer,
         Vars: map[string]interface{} {
             "user": user,
+
+            /* Experimental: Nested Control rendering */
+            "control": func(name string) string {
+                tpl := pongo2.Must(pongo2.FromFile(fmt.Sprintf("templates/base/controls/%s.twig", name)))
+                out, _ := tpl.Execute(map[string]interface{} {
+                    "greeting": "hej",
+                })
+                return out
+            },
         },
     })
 }

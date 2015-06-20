@@ -3,4 +3,5 @@
 {% block body %}
     <p><label>Email:</label> {{ user.Email }}</p>
     <p><label>Phone:</label> {{ user.Phone }}</p>
+    {{ control("hello") | safe }}
 {% endblock %}
